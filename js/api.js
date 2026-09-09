@@ -53,7 +53,7 @@ function loadEvidenceData() {
     .then(function (data) {
       setAllEvidence(data);
       applyStoredBookmarkFlags();
-      setFilteredEvidence(allEvidence); 
+      setFilteredEvidence(allEvidence.slice());
       renderDashboard();
       populateAllDropdowns();
       if (currentPage === "evidence") renderEvidenceList();
