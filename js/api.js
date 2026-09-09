@@ -1,7 +1,7 @@
 import { allEvidence, currentPage, setAllEvidence, setAllLocations, setAllPeople, setAllTimeline, setCaseData, setFilteredEvidence } from "./state.js";
 import { populateAllDropdowns } from "./dropdowns.js";
 import { renderDashboard } from "./views/dashboard.js";
-import { applyStoredBookmarkFlags, renderEvidenceList } from "./views/evidence.js";
+import { applyStoredBookmarkFlags, renderEvidenceList, setEvidenceViewLoading } from "./views/evidence.js";
 import { renderTimeline } from "./views/timeline.js";
 
 var loadingStepsRemaining = 2;
@@ -51,6 +51,7 @@ function loadEvidenceData() {
       return res.json();
     })
     .then(function (data) {
+      setEvidenceViewLoading(false);
       setAllEvidence(data);
       applyStoredBookmarkFlags();
       setFilteredEvidence(allEvidence.slice());

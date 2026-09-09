@@ -5,6 +5,8 @@ import { evidenceMentionsPerson, formatDate, getRelevanceBadgeClass, getStatusBa
 var selectedEvidence = null;
 var evidenceViewLoading = true;
 
+export function setEvidenceViewLoading(value) { evidenceViewLoading = value; }
+
 export function populateEvidenceDropdowns() {
   var typeSelect = document.getElementById("filterType");
   var personSelect = document.getElementById("filterPerson");
