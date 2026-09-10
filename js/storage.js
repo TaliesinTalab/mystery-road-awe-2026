@@ -31,13 +31,14 @@ export function loadNoteForEvidence(evidenceId) {
 }
 
 export function loadNotesFromStorage() {
-  var raw = localStorage.getItem(STORAGE_KEY_NOTES);
-  if (!raw) {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY_NOTES);
+    var parsed = raw ? JSON.parse(raw) : {};
+    notesStore = parsed && typeof parsed === "object" ? parsed : {};
+  } catch (err) {
+    console.warn("Could not read stored notes, starting empty", err);
     notesStore = {};
-    return;
   }
-
-  notesStore = JSON.parse(raw);
 }
 
 export function loadNoteAsync(evidenceId) {

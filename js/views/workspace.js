@@ -118,7 +118,14 @@ function loadHypothesisFromStorage() {
   var raw = localStorage.getItem(STORAGE_KEY_HYPOTHESIS);
   if (!raw) return;
 
-  var draft = JSON.parse(raw); 
+  var draft;
+  try {
+    draft = JSON.parse(raw);
+  } catch (err) {
+    console.warn("Could not read stored hypothesis draft, ignoring it", err);
+    return;
+  }
+  if (!draft || typeof draft !== "object") return;
 
   document.getElementById("hypSuspect").value = draft.suspectId || "";
   document.getElementById("hypNature").value = draft.nature || "";
