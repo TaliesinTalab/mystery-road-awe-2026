@@ -2,17 +2,17 @@ import { allEvidence, allLocations, allPeople, allTimeline, bookmarks, caseData 
 import { formatDate, getStatusBadgeClass } from "../utils.js";
 
 export function renderDashboard() {
-  var container = document.getElementById("dashboardContent");
+  const container = document.getElementById("dashboardContent");
   if (!container) return;
 
-  var reviewedCount = 0;
-  for (var i = 0; i < allEvidence.length; i++) {
+  let reviewedCount = 0;
+  for (let i = 0; i < allEvidence.length; i++) {
     if ((allEvidence[i].status || "").toLowerCase() === "reviewed") reviewedCount++;
   }
 
-  var progressPct = allEvidence.length === 0 ? 0 : Math.round((reviewedCount / allEvidence.length) * 100);
+  const progressPct = allEvidence.length === 0 ? 0 : Math.round((reviewedCount / allEvidence.length) * 100);
 
-  var html = "";
+  let html = "";
   html += '<div class="case-summary-card">';
   html += "<h3>" + (caseData.title || "Case") + "</h3>";
   html += '<p><span class="badge badge-flagged">' + (caseData.status || "unknown").toUpperCase() + "</span></p>";
@@ -36,24 +36,24 @@ export function renderDashboard() {
   html += '<div class="dashboard-columns">';
 
   html += '<div class="dashboard-panel"><h3>Recent evidence</h3>';
-  var recentEvidence = allEvidence.slice(-5).reverse();
+  const recentEvidence = allEvidence.slice(-5).reverse();
   if (recentEvidence.length === 0) {
     html += "<p>No evidence loaded yet.</p>";
   }
-  for (var e = 0; e < recentEvidence.length; e++) {
-    var ev = recentEvidence[e];
+  for (let e = 0; e < recentEvidence.length; e++) {
+    const ev = recentEvidence[e];
     html += '<div class="mini-list-item"><strong>' + ev.id + "</strong> &mdash; " + ev.title +
       ' <span class="badge ' + getStatusBadgeClass(ev.status) + '">' + ev.status + "</span></div>";
   }
   html += "</div>";
 
   html += '<div class="dashboard-panel"><h3>Recent timeline events</h3>';
-  var recentTimeline = allTimeline.slice(-5).reverse();
+  const recentTimeline = allTimeline.slice(-5).reverse();
   if (recentTimeline.length === 0) {
     html += "<p>No timeline events loaded yet.</p>";
   }
-  for (var t = 0; t < recentTimeline.length; t++) {
-    var evt = recentTimeline[t];
+  for (let t = 0; t < recentTimeline.length; t++) {
+    const evt = recentTimeline[t];
     html += '<div class="mini-list-item"><strong>' + formatDate(evt.time) + "</strong><br>" + evt.title + "</div>";
   }
   html += "</div>";

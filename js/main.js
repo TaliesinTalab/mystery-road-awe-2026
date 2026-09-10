@@ -10,10 +10,10 @@ import { saveHypothesis } from "./views/workspace.js";
 function setupEventListeners() {
   window.addEventListener("hashchange", handleHashChange);
 
-  var navButtons = document.querySelectorAll(".nav-btn");
+  const navButtons = document.querySelectorAll(".nav-btn");
   for (let i = 0; i < navButtons.length; i++) {
     navButtons[i].addEventListener("click", () => {
-      var targetView = navButtons[i].getAttribute("data-view");
+      const targetView = navButtons[i].getAttribute("data-view");
       console.log("nav clicked:", targetView);
     });
   }
@@ -25,7 +25,6 @@ function setupEventListeners() {
   document.getElementById("filterLocation").addEventListener("change", renderEvidenceList);
 
   document.getElementById("filterStatus").addEventListener("change", renderEvidenceList);
-  document.getElementById("filterStatus").setAttribute("onchange", "renderEvidenceList()");
 
   document.getElementById("filterRelevance").addEventListener("change", renderEvidenceList);
 
@@ -64,7 +63,6 @@ window.saveHypothesis = saveHypothesis;
 window.handleSortChange = handleSortChange;
 window.closeEvidenceDetail = closeEvidenceDetail;
 window.saveCurrentNote = saveCurrentNote;
-window.renderEvidenceList = renderEvidenceList;
 
 window.addEventListener("DOMContentLoaded", initApp);
 window.addEventListener("hashchange", handleHashChange);

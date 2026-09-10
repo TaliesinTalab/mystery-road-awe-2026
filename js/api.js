@@ -1,14 +1,15 @@
 import { allEvidence, currentPage, setAllEvidence, setAllLocations, setAllPeople, setAllTimeline, setCaseData, setFilteredEvidence } from "./state.js";
 import { populateAllDropdowns } from "./dropdowns.js";
 import { renderDashboard } from "./views/dashboard.js";
-import { applyStoredBookmarkFlags, renderEvidenceList, setEvidenceViewLoading } from "./views/evidence.js";
+import { renderEvidenceList, setEvidenceViewLoading } from "./views/evidence.js";
 import { renderTimeline } from "./views/timeline.js";
+import { renderWorkspace } from "./views/workspace.js";
 
-var loadingStepsRemaining = 2;
+let loadingStepsRemaining = 2;
 
 function showLoadingOverlay(msg) {
-  var overlay = document.getElementById("loadingOverlay");
-  var text = document.getElementById("loadingText");
+  const overlay = document.getElementById("loadingOverlay");
+  const text = document.getElementById("loadingText");
   if (text) text.textContent = msg;
   if (overlay) overlay.classList.remove("hidden");
 }
@@ -16,22 +17,22 @@ function showLoadingOverlay(msg) {
 function hideLoadingStep() {
   loadingStepsRemaining--;
   if (loadingStepsRemaining <= 0) {
-    var overlay = document.getElementById("loadingOverlay");
+    const overlay = document.getElementById("loadingOverlay");
     if (overlay) overlay.classList.add("hidden");
   }
 }
 
 async function loadCorePeopleAndLocations() {
-  var caseRes = await fetch("data/case.json");
-  var caseJson = await caseRes.json();
+  const caseRes = await fetch("data/case.json");
+  const caseJson = await caseRes.json();
   setCaseData(caseJson);
 
-  var peopleRes = await fetch("data/people.json");
-  var peopleJson = await peopleRes.json();
+  const peopleRes = await fetch("data/people.json");
+  const peopleJson = await peopleRes.json();
   setAllPeople(peopleJson);
 
-  var locationsRes = await fetch("data/locations.json");
-  var locationsJson = await locationsRes.json();
+  const locationsRes = await fetch("data/locations.json");
+  const locationsJson = await locationsRes.json();
   setAllLocations(locationsJson);
 
   hideLoadingStep();
@@ -47,11 +48,11 @@ function loadEvidenceData() {
     .then(function (data) {
       setEvidenceViewLoading(false);
       setAllEvidence(data);
-      applyStoredBookmarkFlags();
       setFilteredEvidence(allEvidence.slice());
       renderDashboard();
       populateAllDropdowns();
       if (currentPage === "evidence") renderEvidenceList();
+      if (currentPage === "workspace") renderWorkspace();
     })
     .catch(function (err) {
       console.error("Failed to load evidence.json", err);
@@ -61,8 +62,8 @@ function loadEvidenceData() {
 
 async function loadTimelineData() {
   try {
-    var res = await fetch("data/timeline.json");
-    var data = await res.json();
+    const res = await fetch("data/timeline.json");
+    const data = await res.json();
     setAllTimeline(data);
     renderDashboard();
     if (currentPage === "timeline") renderTimeline();
