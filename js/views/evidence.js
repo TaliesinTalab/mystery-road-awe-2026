@@ -159,21 +159,13 @@ function sortEvidence(list) {
   var sortValue = document.getElementById("sortEvidence").value;
 
   if (sortValue === "title-asc") {
-    list.sort(function (a, b) {
-      return a.title.localeCompare(b.title);
-    });
+    list.sort((a, b) => a.title.localeCompare(b.title));
   } else if (sortValue === "title-desc") {
-    list.sort(function (a, b) {
-      return b.title.localeCompare(a.title);
-    });
+    list.sort((a, b) => b.title.localeCompare(a.title));
   } else if (sortValue === "date-asc") {
-    list.sort(function (a, b) {
-      return new Date(a.timestamp) - new Date(b.timestamp);
-    });
+    list.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   } else {
-    list.sort(function (a, b) {
-      return new Date(b.timestamp) - new Date(a.timestamp);
-    });
+    list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   }
   return list;
 }

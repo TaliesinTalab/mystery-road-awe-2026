@@ -11,25 +11,25 @@ export function formatDate(ts) {
         " " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
 }
 
-export function getStatusBadgeClass(status) {
+export const getStatusBadgeClass = (status) => {
     var s = (status || "").toLowerCase();
     if (s === "reviewed") return "badge-reviewed";
     if (s === "flagged") return "badge-flagged";
     return "badge-unreviewed";
-}
+};
 
-export function getRelevanceBadgeClass(relevance) {
+export const getRelevanceBadgeClass = (relevance) => {
     var r = (relevance || "").toLowerCase();
     if (r === "relevant") return "badge-relevant";
     return "badge-unreviewed";
-}
+};
 
-export function certaintyBadgeClass(certainty) {
+export const certaintyBadgeClass = (certainty) => {
     if (certainty === "confirmed") return "reviewed";
     if (certainty === "contradictory") return "critical";
     if (certainty === "reported") return "flagged";
     return "unreviewed";
-}
+};
 
 export function getSelectedOptions(selectEl) {
     var result = [];
