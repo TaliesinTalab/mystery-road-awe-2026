@@ -21,28 +21,22 @@ function hideLoadingStep() {
   }
 }
 
-function loadCorePeopleAndLocations() {
-  return fetch("data/case.json").then(function (caseRes) {
-    return caseRes.json().then(function (caseJson) {
-      setCaseData(caseJson);
+async function loadCorePeopleAndLocations() {
+  var caseRes = await fetch("data/case.json");
+  var caseJson = await caseRes.json();
+  setCaseData(caseJson);
 
-      return fetch("data/people.json").then(function (peopleRes) {
-        return peopleRes.json().then(function (peopleJson) {
-          setAllPeople(peopleJson);
+  var peopleRes = await fetch("data/people.json");
+  var peopleJson = await peopleRes.json();
+  setAllPeople(peopleJson);
 
-          return fetch("data/locations.json").then(function (locationsRes) {
-            return locationsRes.json().then(function (locationsJson) {
-              setAllLocations(locationsJson);
+  var locationsRes = await fetch("data/locations.json");
+  var locationsJson = await locationsRes.json();
+  setAllLocations(locationsJson);
 
-              hideLoadingStep();
-              renderDashboard();
-              populateAllDropdowns();
-            });
-          });
-        });
-      });
-    });
-  });
+  hideLoadingStep();
+  renderDashboard();
+  populateAllDropdowns();
 }
 
 function loadEvidenceData() {
@@ -65,23 +59,19 @@ function loadEvidenceData() {
     });
 }
 
-function loadTimelineData() {
-  return fetch("data/timeline.json")
-    .then(function (res) {
-      return res.json();
-    })
-    .then(function (data) {
-      setAllTimeline(data);
-      renderDashboard();
-      if (currentPage === "timeline") renderTimeline();
-      populateAllDropdowns();
-    })
-    .catch(function (err) {
-      console.log("timeline load error", err);
-    })
-    .finally(function () {
-      hideLoadingStep();
-    });
+async function loadTimelineData() {
+  try {
+    var res = await fetch("data/timeline.json");
+    var data = await res.json();
+    setAllTimeline(data);
+    renderDashboard();
+    if (currentPage === "timeline") renderTimeline();
+    populateAllDropdowns();
+  } catch (err) {
+    console.log("timeline load error", err);
+  } finally {
+    hideLoadingStep();
+  }
 }
 
 export function loadAllData() {
