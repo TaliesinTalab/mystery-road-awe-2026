@@ -1,0 +1,28 @@
+{
+  "name": "mystery-road-awe-2026",
+  "version": "1.0.0",
+  "description": "Investigate the failure of an AI-assisted rehabilitation robot.",
+  "main": "js/main.js",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "serve ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaliesinTalab/mystery-road-awe-2026.git"
+  },
+  "keywords": [],
+  "author": "Taliesin Talab",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TaliesinTalab/mystery-road-awe-2026/issues"
+  },
+  "homepage": "https://github.com/TaliesinTalab/mystery-road-awe-2026#readme",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "devDependencies": {
+    "serve": "^14.2.6"
+  }
+}
