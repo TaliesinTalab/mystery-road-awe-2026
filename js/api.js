@@ -1,7 +1,19 @@
-import { allEvidence, currentPage, setAllEvidence, setAllLocations, setAllPeople, setAllTimeline, setCaseData, setFilteredEvidence } from "./state.js";
+import {
+  allEvidence,
+  currentPage,
+  setAllEvidence,
+  setAllLocations,
+  setAllPeople,
+  setAllTimeline,
+  setCaseData,
+  setFilteredEvidence,
+} from "./state.js";
 import { populateAllDropdowns } from "./dropdowns.js";
 import { renderDashboard } from "./views/dashboard.js";
-import { renderEvidenceList, setEvidenceViewLoading } from "./views/evidence.js";
+import {
+  renderEvidenceList,
+  setEvidenceViewLoading,
+} from "./views/evidence.js";
 import { renderTimeline } from "./views/timeline.js";
 import { renderWorkspace } from "./views/workspace.js";
 
