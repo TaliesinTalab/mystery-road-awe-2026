@@ -61,3 +61,13 @@ export type TimelineEvent = {
   locationIds: string[];
   evidenceIds: string[];
 };
+
+export type HypothesisDraft = {
+  suspectId: string;
+  nature: string;
+  evidenceIds: string[];
+  confidence: string;
+  explanation: string;
+  alternative: string;
+  savedAt: string;
+};

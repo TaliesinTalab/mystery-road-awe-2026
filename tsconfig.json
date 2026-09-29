@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "strict": true,
-    "noEmit": true,
-    "allowJs": true
+    "noEmit": true
   },
   "include": ["js"]
 }

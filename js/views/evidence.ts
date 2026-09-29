@@ -17,20 +17,22 @@ import {
   saveBookmarksToStorage,
   saveNoteForEvidence,
 } from "../storage.js";
+import type { Evidence } from "../types.js";
 import {
   evidenceMentionsPerson,
   formatDate,
+  getElement,
   getRelevanceBadgeClass,
   getStatusBadgeClass,
 } from "../utils.js";
 
 let evidenceViewLoading = true;
 
-export function setEvidenceViewLoading(value) {
+export function setEvidenceViewLoading(value: boolean): void {
   evidenceViewLoading = value;
 }
 
-export function populateEvidenceDropdowns() {
+export function populateEvidenceDropdowns(): void {
   const typeSelect = document.getElementById("filterType");
   const personSelect = document.getElementById("filterPerson");
   const locationSelect = document.getElementById("filterLocation");
@@ -70,14 +72,17 @@ export function populateEvidenceDropdowns() {
   }
 }
 
-function getFilteredEvidence() {
+function getFilteredEvidence(): Evidence[] {
   const searchBox = document.getElementById("evidenceSearch");
-  const searchTerm = searchBox ? searchBox.value.toLowerCase().trim() : "";
-  const typeVal = document.getElementById("filterType").value;
-  const personVal = document.getElementById("filterPerson").value;
-  const locationVal = document.getElementById("filterLocation").value;
-  const statusVal = document.getElementById("filterStatus").value;
-  const relevanceVal = document.getElementById("filterRelevance").value;
+  const searchTerm =
+    searchBox instanceof HTMLInputElement
+      ? searchBox.value.toLowerCase().trim()
+      : "";
+  const typeVal = getElement("filterType", HTMLSelectElement).value;
+  const personVal = getElement("filterPerson", HTMLSelectElement).value;
+  const locationVal = getElement("filterLocation", HTMLSelectElement).value;
+  const statusVal = getElement("filterStatus", HTMLSelectElement).value;
+  const relevanceVal = getElement("filterRelevance", HTMLSelectElement).value;
 
   const results = [];
   for (let i = 0; i < allEvidence.length; i++) {
@@ -118,7 +123,7 @@ function getFilteredEvidence() {
   return filteredEvidence;
 }
 
-export function renderEvidenceList() {
+export function renderEvidenceList(): void {
   const container = document.getElementById("evidenceList");
   if (!container) return;
 
@@ -145,7 +150,7 @@ export function renderEvidenceList() {
   container.addEventListener("click", handleEvidenceListClick);
 }
 
-function renderEvidenceCardHTML(ev) {
+function renderEvidenceCardHTML(ev: Evidence): string {
   const isBookmarked = bookmarks.indexOf(ev.id) !== -1;
   let html = '<div class="evidence-card" data-id="' + ev.id + '">';
   html +=
@@ -193,22 +198,23 @@ function renderEvidenceCardHTML(ev) {
   return html;
 }
 
-function handleEvidenceListClick(event) {
+function handleEvidenceListClick(event: MouseEvent): void {
   const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
 
-  if (target.dataset && target.dataset.action === "bookmark") {
+  if (target.dataset.action === "bookmark") {
     event.stopPropagation();
-    handleBookmarkClick(target.dataset.id);
+    handleBookmarkClick(target.dataset.id ?? "");
     return;
   }
 
   const card = target.closest(".evidence-card");
   if (card) {
-    openEvidenceDetail(card.getAttribute("data-id"));
+    openEvidenceDetail(card.getAttribute("data-id") ?? "");
   }
 }
 
-function handleBookmarkClick(evidenceId) {
+function handleBookmarkClick(evidenceId: string): void {
   const ev = findEvidenceById(evidenceId);
   if (!ev) return;
 
@@ -225,36 +231,42 @@ function handleBookmarkClick(evidenceId) {
   if (currentPage === "evidence") renderEvidenceList();
 }
 
-function sortEvidence(list) {
-  const sortValue = document.getElementById("sortEvidence").value;
+function sortEvidence(list: Evidence[]): Evidence[] {
+  const sortValue = getElement("sortEvidence", HTMLSelectElement).value;
 
   if (sortValue === "title-asc") {
     list.sort((a, b) => a.title.localeCompare(b.title));
   } else if (sortValue === "title-desc") {
     list.sort((a, b) => b.title.localeCompare(a.title));
   } else if (sortValue === "date-asc") {
-    list.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    list.sort(
+      (a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+    );
   } else {
-    list.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    list.sort(
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
+    );
   }
   return list;
 }
 
-export function handleSortChange() {
+export function handleSortChange(): void {
   renderEvidenceList();
 }
 
-export function clearFilters() {
-  document.getElementById("evidenceSearch").value = "";
-  document.getElementById("filterType").value = "";
-  document.getElementById("filterPerson").value = "";
-  document.getElementById("filterLocation").value = "";
-  document.getElementById("filterStatus").value = "";
-  document.getElementById("filterRelevance").value = "";
+export function clearFilters(): void {
+  getElement("evidenceSearch", HTMLInputElement).value = "";
+  getElement("filterType", HTMLSelectElement).value = "";
+  getElement("filterPerson", HTMLSelectElement).value = "";
+  getElement("filterLocation", HTMLSelectElement).value = "";
+  getElement("filterStatus", HTMLSelectElement).value = "";
+  getElement("filterRelevance", HTMLSelectElement).value = "";
   renderEvidenceList();
 }
 
-function simulateAsyncSearch(term) {
+function simulateAsyncSearch(term: string): Promise<string> {
   return new Promise(function (resolve) {
     setTimeout(function () {
       resolve(term);
@@ -264,8 +276,10 @@ function simulateAsyncSearch(term) {
 
 let latestSearchRequestId = 0;
 
-export function handleSearchInput(event) {
-  const term = event.target.value;
+export function handleSearchInput(event: Event): void {
+  const target = event.target;
+  if (!(target instanceof HTMLInputElement)) return;
+  const term = target.value;
   const requestId = ++latestSearchRequestId;
 
   simulateAsyncSearch(term).then(function () {
@@ -276,25 +290,25 @@ export function handleSearchInput(event) {
   });
 }
 
-export function openEvidenceDetail(evidenceId) {
+export function openEvidenceDetail(evidenceId: string): void {
   const ev = findEvidenceById(evidenceId);
   if (!ev) return;
 
-  const section = document.getElementById("evidenceDetailSection");
+  const section = getElement("evidenceDetailSection", HTMLDivElement);
   section.classList.remove("hidden");
 
   renderEvidenceDetail(ev);
   section.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-export function closeEvidenceDetail() {
-  const section = document.getElementById("evidenceDetailSection");
+export function closeEvidenceDetail(): void {
+  const section = getElement("evidenceDetailSection", HTMLDivElement);
   section.classList.add("hidden");
   section.innerHTML = "";
 }
 
-function renderEvidenceDetail(ev) {
-  const section = document.getElementById("evidenceDetailSection");
+function renderEvidenceDetail(ev: Evidence): void {
+  const section = getElement("evidenceDetailSection", HTMLDivElement);
 
   const personNames = [];
   for (let p = 0; p < ev.personIds.length; p++) {
@@ -383,32 +397,38 @@ function renderEvidenceDetail(ev) {
 
   section.innerHTML = html;
 
-  document
-    .getElementById("detailStatusSelect")
-    .addEventListener("change", function (e) {
-      ev.status = e.target.value; // direct mutation of the loaded evidence object
-      renderEvidenceDetail(ev);
-      if (viewRendered.evidence) renderEvidenceList();
-    });
-  document
-    .getElementById("detailRelevanceSelect")
-    .addEventListener("change", function (e) {
-      ev.relevance = e.target.value;
-      renderEvidenceDetail(ev);
-      if (viewRendered.evidence) renderEvidenceList();
-    });
+  const statusSelect = getElement("detailStatusSelect", HTMLSelectElement);
+  statusSelect.addEventListener("change", function () {
+    ev.status = statusSelect.value; // direct mutation of the loaded evidence object
+    renderEvidenceDetail(ev);
+    if (viewRendered.evidence) renderEvidenceList();
+  });
+  const relevanceSelect = getElement(
+    "detailRelevanceSelect",
+    HTMLSelectElement,
+  );
+  relevanceSelect.addEventListener("change", function () {
+    ev.relevance = relevanceSelect.value;
+    renderEvidenceDetail(ev);
+    if (viewRendered.evidence) renderEvidenceList();
+  });
 }
 
-function statusOptionHTML(current, value, label) {
+function statusOptionHTML(
+  current: string,
+  value: string,
+  label: string,
+): string {
   const currentLower = (current || "").toLowerCase();
   const selected = currentLower === value ? " selected" : "";
   return '<option value="' + value + '"' + selected + ">" + label + "</option>";
 }
 
-export function saveCurrentNote() {
+export function saveCurrentNote(): void {
   const textarea = document.getElementById("evidenceNoteInput");
-  if (!textarea) return;
+  if (!(textarea instanceof HTMLTextAreaElement)) return;
   const evidenceId = textarea.getAttribute("data-evidence-id"); // note id is read back off the DOM
+  if (!evidenceId) return;
   const text = textarea.value;
   saveNoteForEvidence(evidenceId, text);
   const preview = document.getElementById("notePreview");
