@@ -1,4 +1,7 @@
-export function evidenceMentionsPerson(ev, person) {
+export function evidenceMentionsPerson(
+  ev: { personIds?: string[] },
+  person: { id: string; name: string },
+): boolean {
   if (!ev.personIds) return false;
   return (
     ev.personIds.indexOf(person.id) !== -1 ||
@@ -6,7 +9,7 @@ export function evidenceMentionsPerson(ev, person) {
   );
 }
 
-export function formatDate(ts) {
+export function formatDate(ts: string | undefined): string {
   if (!ts) return "Unknown date";
   const d = new Date(ts);
   if (isNaN(d.getTime())) return ts;
@@ -21,28 +24,30 @@ export function formatDate(ts) {
   );
 }
 
-export const getStatusBadgeClass = (status) => {
+export const getStatusBadgeClass = (status: string | undefined): string => {
   const s = (status || "").toLowerCase();
   if (s === "reviewed") return "badge-reviewed";
   if (s === "flagged") return "badge-flagged";
   return "badge-unreviewed";
 };
 
-export const getRelevanceBadgeClass = (relevance) => {
+export const getRelevanceBadgeClass = (
+  relevance: string | undefined,
+): string => {
   const r = (relevance || "").toLowerCase();
   if (r === "relevant") return "badge-relevant";
   return "badge-unreviewed";
 };
 
-export const certaintyBadgeClass = (certainty) => {
+export const certaintyBadgeClass = (certainty: string): string => {
   if (certainty === "confirmed") return "reviewed";
   if (certainty === "contradictory") return "critical";
   if (certainty === "reported") return "flagged";
   return "unreviewed";
 };
 
-export function getSelectedOptions(selectEl) {
-  const result = [];
+export function getSelectedOptions(selectEl: HTMLSelectElement): string[] {
+  const result: string[] = [];
   for (let i = 0; i < selectEl.options.length; i++) {
     if (selectEl.options[i].selected) result.push(selectEl.options[i].value);
   }
