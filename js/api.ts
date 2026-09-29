@@ -8,6 +8,13 @@ import {
   setCaseData,
   setFilteredEvidence,
 } from "./state.js";
+import type {
+  CaseData,
+  CaseLocation,
+  Evidence,
+  Person,
+  TimelineEvent,
+} from "./types.js";
 import { populateAllDropdowns } from "./dropdowns.js";
 import { renderDashboard } from "./views/dashboard.js";
 import {
@@ -19,14 +26,14 @@ import { renderWorkspace } from "./views/workspace.js";
 
 let loadingStepsRemaining = 2;
 
-function showLoadingOverlay(msg) {
+function showLoadingOverlay(msg: string): void {
   const overlay = document.getElementById("loadingOverlay");
   const text = document.getElementById("loadingText");
   if (text) text.textContent = msg;
   if (overlay) overlay.classList.remove("hidden");
 }
 
-function hideLoadingStep() {
+function hideLoadingStep(): void {
   loadingStepsRemaining--;
   if (loadingStepsRemaining <= 0) {
     const overlay = document.getElementById("loadingOverlay");
@@ -34,17 +41,17 @@ function hideLoadingStep() {
   }
 }
 
-async function loadCorePeopleAndLocations() {
+async function loadCorePeopleAndLocations(): Promise<void> {
   const caseRes = await fetch("data/case.json");
-  const caseJson = await caseRes.json();
+  const caseJson: CaseData = await caseRes.json();
   setCaseData(caseJson);
 
   const peopleRes = await fetch("data/people.json");
-  const peopleJson = await peopleRes.json();
+  const peopleJson: Person[] = await peopleRes.json();
   setAllPeople(peopleJson);
 
   const locationsRes = await fetch("data/locations.json");
-  const locationsJson = await locationsRes.json();
+  const locationsJson: CaseLocation[] = await locationsRes.json();
   setAllLocations(locationsJson);
 
   hideLoadingStep();
@@ -52,12 +59,12 @@ async function loadCorePeopleAndLocations() {
   populateAllDropdowns();
 }
 
-function loadEvidenceData() {
+function loadEvidenceData(): void {
   fetch("data/evidence.json")
-    .then(function (res) {
+    .then(function (res: Response): Promise<Evidence[]> {
       return res.json();
     })
-    .then(function (data) {
+    .then(function (data: Evidence[]): void {
       setEvidenceViewLoading(false);
       setAllEvidence(data);
       setFilteredEvidence(allEvidence.slice());
@@ -72,10 +79,10 @@ function loadEvidenceData() {
     });
 }
 
-async function loadTimelineData() {
+async function loadTimelineData(): Promise<void> {
   try {
     const res = await fetch("data/timeline.json");
-    const data = await res.json();
+    const data: TimelineEvent[] = await res.json();
     setAllTimeline(data);
     renderDashboard();
     if (currentPage === "timeline") renderTimeline();
@@ -87,7 +94,7 @@ async function loadTimelineData() {
   }
 }
 
-export function loadAllData() {
+export function loadAllData(): Promise<void> {
   showLoadingOverlay("Loading case file…");
   loadingStepsRemaining = 2;
   return loadCorePeopleAndLocations().then(function () {

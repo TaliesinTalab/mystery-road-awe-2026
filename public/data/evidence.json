@@ -45,7 +45,7 @@
     "timestamp": "2026-10-16T07:03:00Z",
     "summary": "Camera DC-04 is missing from Equipment Storage.",
     "content": "Morning inventory check of Equipment Storage found that depth camera DC-04 is not on its assigned shelf. There is no active checkout entry for the unit in the storage log. Last confirmed sighting was in the Immersive Systems Studio two evenings prior.",
-    "personIds": ["Nova Byte"],
+    "personIds": ["nova-byte"],
     "locationIds": ["L05", "L03"],
     "tags": ["equipment", "camera"],
     "status": "unreviewed",

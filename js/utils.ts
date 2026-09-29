@@ -1,12 +1,7 @@
-export function evidenceMentionsPerson(
-  ev: { personIds?: string[] },
-  person: { id: string; name: string },
-): boolean {
-  if (!ev.personIds) return false;
-  return (
-    ev.personIds.indexOf(person.id) !== -1 ||
-    ev.personIds.indexOf(person.name) !== -1
-  );
+import type { Evidence, Person } from "./types.js";
+
+export function evidenceMentionsPerson(ev: Evidence, person: Person): boolean {
+  return ev.personIds.indexOf(person.id) !== -1;
 }
 
 export function formatDate(ts: string | undefined): string {
