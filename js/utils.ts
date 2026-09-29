@@ -1,5 +1,14 @@
 import type { Evidence, Person } from "./types.js";
 
+export function getElement<T extends HTMLElement>(
+  id: string,
+  type: new () => T,
+): T {
+  const el = document.getElementById(id);
+  if (!(el instanceof type)) throw new Error("Missing element #" + id);
+  return el;
+}
+
 export function evidenceMentionsPerson(ev: Evidence, person: Person): boolean {
   return ev.personIds.indexOf(person.id) !== -1;
 }

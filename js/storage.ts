@@ -4,13 +4,13 @@ const STORAGE_KEY_BOOKMARKS = "remotion_bookmarks";
 const STORAGE_KEY_NOTES = "remotion_notes";
 export const STORAGE_KEY_HYPOTHESIS = "remotion_hypothesis";
 
-export let notesStore = {};
+export let notesStore: Record<string, string> = {};
 
-export function saveBookmarksToStorage() {
+export function saveBookmarksToStorage(): void {
   localStorage.setItem(STORAGE_KEY_BOOKMARKS, JSON.stringify(bookmarks));
 }
 
-export function loadBookmarksFromStorage() {
+export function loadBookmarksFromStorage(): void {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_BOOKMARKS);
     const parsed = raw ? JSON.parse(raw) : [];
@@ -21,16 +21,16 @@ export function loadBookmarksFromStorage() {
   }
 }
 
-export function saveNoteForEvidence(evidenceId, text) {
+export function saveNoteForEvidence(evidenceId: string, text: string): void {
   notesStore[evidenceId] = text;
   localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(notesStore));
 }
 
-export function loadNoteForEvidence(evidenceId) {
+export function loadNoteForEvidence(evidenceId: string): string {
   return notesStore[evidenceId] || "";
 }
 
-export function loadNotesFromStorage() {
+export function loadNotesFromStorage(): void {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_NOTES);
     const parsed = raw ? JSON.parse(raw) : {};
@@ -41,7 +41,7 @@ export function loadNotesFromStorage() {
   }
 }
 
-export function loadNoteAsync(evidenceId) {
+export function loadNoteAsync(evidenceId: string): Promise<string> {
   return new Promise(function (resolve) {
     resolve(notesStore[evidenceId] || "");
   });

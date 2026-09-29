@@ -1,11 +1,12 @@
 import { setCurrentPage, viewRendered } from "./state.js";
+import { getElement } from "./utils.js";
 import { renderDashboard } from "./views/dashboard.js";
 import { renderEvidenceList } from "./views/evidence.js";
 import { renderLocations, renderPeople } from "./views/people.js";
 import { renderTimeline } from "./views/timeline.js";
 import { renderWorkspace } from "./views/workspace.js";
 
-export function handleHashChange() {
+export function handleHashChange(): void {
   let hash = window.location.hash.replace("#", "");
   const validViews = [
     "dashboard",
@@ -23,7 +24,7 @@ export function handleHashChange() {
   for (let i = 0; i < sections.length; i++) {
     sections[i].classList.remove("active");
   }
-  document.getElementById("view-" + hash).classList.add("active");
+  getElement("view-" + hash, HTMLElement).classList.add("active");
 
   const navButtons = document.querySelectorAll(".nav-btn");
   for (let n = 0; n < navButtons.length; n++) {
