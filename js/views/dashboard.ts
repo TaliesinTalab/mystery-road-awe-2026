@@ -8,7 +8,7 @@ import {
 } from "../state.js";
 import { formatDate, getStatusBadgeClass } from "../utils.js";
 
-export function renderDashboard() {
+export function renderDashboard(): void {
   const container = document.getElementById("dashboardContent");
   if (!container) return;
 
@@ -93,7 +93,7 @@ export function renderDashboard() {
   container.innerHTML = html;
 }
 
-function statCardHTML(value, label) {
+function statCardHTML(value: number, label: string): string {
   return (
     '<div class="stat-card"><div class="stat-value">' +
     value +

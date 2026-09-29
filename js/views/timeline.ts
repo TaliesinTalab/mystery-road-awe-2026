@@ -6,10 +6,10 @@ import {
   findLocationById,
 } from "../state.js";
 import { navigateTo } from "../navigation.js";
-import { certaintyBadgeClass, formatDate } from "../utils.js";
+import { certaintyBadgeClass, formatDate, getElement } from "../utils.js";
 import { openEvidenceDetail } from "./evidence.js";
 
-export function populateTimelineDropdowns() {
+export function populateTimelineDropdowns(): void {
   const personSelect = document.getElementById("timelinePersonFilter");
   const locationSelect = document.getElementById("timelineLocationFilter");
   const typeSelect = document.getElementById("timelineTypeFilter");
@@ -47,21 +47,26 @@ export function populateTimelineDropdowns() {
   }
 }
 
-export function renderTimeline() {
+export function renderTimeline(): void {
   const container = document.getElementById("timelineContainer");
   if (!container) return;
 
-  const order = document.getElementById("timelineOrder").value;
-  const personFilter = document.getElementById("timelinePersonFilter").value;
-  const locationFilter = document.getElementById(
-    "timelineLocationFilter",
+  const order = getElement("timelineOrder", HTMLSelectElement).value;
+  const personFilter = getElement(
+    "timelinePersonFilter",
+    HTMLSelectElement,
   ).value;
-  const typeFilter = document.getElementById("timelineTypeFilter").value;
+  const locationFilter = getElement(
+    "timelineLocationFilter",
+    HTMLSelectElement,
+  ).value;
+  const typeFilter = getElement("timelineTypeFilter", HTMLSelectElement).value;
 
   let events = [];
   for (let i = 0; i < allTimeline.length; i++) {
     const evt = allTimeline[i];
-    if (personFilter && evt.personIds.indexOf(personFilter) === -1) continue;
+    if (personFilter && !evt.personIds.some((id) => id === personFilter))
+      continue;
     if (locationFilter && evt.locationIds.indexOf(locationFilter) === -1)
       continue;
     if (typeFilter && evt.type !== typeFilter) continue;
@@ -69,7 +74,7 @@ export function renderTimeline() {
   }
 
   events = events.slice().sort(function (a, b) {
-    const diff = new Date(a.time) - new Date(b.time);
+    const diff = new Date(a.time).getTime() - new Date(b.time).getTime();
     return order === "desc" ? -diff : diff;
   });
 
@@ -119,38 +124,43 @@ export function renderTimeline() {
 
   const linkButtons = container.querySelectorAll(".evidence-link-btn");
   for (let b = 0; b < linkButtons.length; b++) {
-    linkButtons[b].addEventListener("click", function (e) {
-      openEvidenceModal(e.target.getAttribute("data-evidence-id"));
+    const linkButton = linkButtons[b];
+    linkButton.addEventListener("click", function () {
+      openEvidenceModal(linkButton.getAttribute("data-evidence-id") ?? "");
     });
   }
 }
 
 // --- Quick-view modal (used from the timeline) -------------------------
-function openEvidenceModal(evidenceId) {
+function openEvidenceModal(evidenceId: string): void {
   const ev = findEvidenceById(evidenceId);
   if (!ev) return;
 
   let modal = document.getElementById("quickViewModal");
   if (!modal) {
-    modal = document.createElement("div");
-    modal.id = "quickViewModal";
-    document.body.appendChild(modal);
+    const newModal = document.createElement("div");
+    newModal.id = "quickViewModal";
+    document.body.appendChild(newModal);
 
-    modal.addEventListener("click", function (e) {
+    newModal.addEventListener("click", function (e) {
+      const target = e.target;
+      if (!(target instanceof HTMLElement)) return;
       if (
-        e.target.classList.contains("modal-close-btn") ||
-        e.target.classList.contains("modal-backdrop")
+        target.classList.contains("modal-close-btn") ||
+        target.classList.contains("modal-backdrop")
       ) {
-        modal.innerHTML = "";
+        newModal.innerHTML = "";
       }
-      if (e.target.getAttribute && e.target.getAttribute("data-open-full")) {
-        modal.innerHTML = "";
+      const fullEvidenceId = target.getAttribute("data-open-full");
+      if (fullEvidenceId) {
+        newModal.innerHTML = "";
         navigateTo("evidence");
         setTimeout(function () {
-          openEvidenceDetail(e.target.getAttribute("data-open-full"));
+          openEvidenceDetail(fullEvidenceId);
         }, 0);
       }
     });
+    modal = newModal;
   }
 
   modal.innerHTML =
