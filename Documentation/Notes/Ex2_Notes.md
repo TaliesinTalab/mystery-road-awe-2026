@@ -176,7 +176,7 @@ _Why lint and lint:fix as two scripts ?_
 _What does npm run lint do under the hood ? Would a global ESLint work?_
 - npm reads 'scripts.lint' from package.json and runs that string ('eslint js') in a shell.
 
-## Demo 5: TypeScript Setup
+## Demo 5: TypeScript setup
 
 >npm install --save-dev typescript@6
 >
@@ -197,6 +197,7 @@ In package.json, I changed dev and built to:
 
 ### Conversion
 Both navigation and utils do not import anything and only hold helper functions. I just had to go through them and define types for variables and arguments (since that's what TypeScript wants).
+I'm not going to mention this from now on, so whenever we are converting to typescript, assume that we are going through the files to define the types. It is a right pain and a lot of manual labour, that _you should use AI for in future_.
 
 ### Questions
 _What does strict turn on? Two checks, kept on and why?_
@@ -212,4 +213,88 @@ _Compile-time type error vs the runtime bugs from Ex1, could TS have caught them
 _What does any do, why avoid it in the first pass?_
 - Any switches checking off for that value and everything that touches it. So any property access, call, assignable to and from every type, and it spreads. It silences the error without telling the error (which is asking 'what is this thing') the answer. It is stinky too
 
-## Demo 6: 
+## Demo 6: Typing domain data
+
+>Rename state.js and api.js to state.ts and api.ts
+>
+>new js/types.ts
+>
+>npx tsc (should output no errors)
+>
+>npm run dev (nothing should have changed)
+
+### js/types.ts
+Check the file for code
+
+### Ambiguous field: personIds
+In js it was an entry in personIds, which could be an id (nova-byte) OR a name (Nova Byte).
+Now with personIds being an array of the personIds type, the old version does not work anymore. TS forces me to decide what a personId is, and I decided that it is IDs only, and not names.
+
+### Questions
+_The ambiguous field, how did JS get away with it and what did TS force?_
+- See section above
+
+_A data-shape problem types can't catch? What else would you need?_
+- Types are erased at build time and res.json() is typed _any_, so const data: Evidence[] = await.json() is an unchecked promise. If evidence.json still had the name "Nova Byte" instead of a personId, tsc would stay happy and the app would load it, and it would only surface at runtime as a wrong filter result or undefined. You need runtime validation in addition, either a hand-written type guard or a schema library that validates the object and revices the TS type from the same schema.
+
+_interface vs type for an object shape, which did I use and does it matter here_
+- I used type. For object shapes, they are basically the same.
+- Interface can be declared twice and the declarations merge, types cannot
+- interface extends with _extend_, type composes with &
+- only type can express unions, literals, tuples. PersonId is a union, so it has to be a type.
+- I used type for consistence, since PersonId needs type, why bother with interface when I can type everything lol
+
+## Demo 7: Full migration
+
+Alright, I'm mentioning this again just in case you forgot. Migration is a massive pain, you _should_ use AI for this to help you along since Leon's document is a pain to read in my opinion. I'm not detailing the steps of how you migrate, so if you are interested compare the diffs through git.
+
+I did this in three parts:
+1. a) typescript-eslint, getElement helper, main / router / storage / dropdowns
+2. b) dashboard, people, timeline
+3. c) evidence, workspace, allowJs removed
+   In the end, every file under the js/ directory was changed to ts. tsconfig has only strict and noEmit, npx tsc = 0 errors, and npm run lint = 0 problems, and clicking through the site shows no differences to the js version.
+
+### Questions
+_one type error I had to think about, what did it tell me that review/testing had not?_
+- saveCurrentNote: The id of the note is read back from a data attribute, and getAttribute returns string | null. Reading the code, the attribute is obviously always there, and testing always passes because the renderer always writes it. The compiler doesn't trust "obviously": it pointed out that the function has no answer for the missing case, and the JS answer would have been to save the note under the literal key "null". Review and testing only ever see the happy path the code was written for. The type forced a decision for the other path: do nothing.
+
+_when is any the right call during a migration, where do I draw the line?_
+- _Any_ is bullshit, I draw the line at using it at all during migration. Eradication is the right call
+
+_did the migration reveal a genuine, previously unnoticed bug ?_
+- Yes, the saveCurrentNote bug (first question).
+
+## Demo 8: GitHub Actions
+
+See the .yml file: under .github/workflows/ci.yml (and remember DevOps ! lol)
+
+### CI explanations
+- on: push + pull_request push with no branch filter = every push to every branch (including the exercise branches later). pull_request = checks the code a PR would produce once merged, _before merging_. Downside is that it'll run twice when pushing to a branch with an open PR, but that that's fine
+- runs-on: ubuntu-latest, every job gets a brand new, empty VM from GitHub
+- actions/checkout the VM starts empty, this clones the repo into it
+- actions/setup-node installs Node
+- cache: npm see question 3. Set explicitly: setup-node only caches on its own when package.json has a packageManager field, and mine doesn't
+- npm ci NOT npm install installs exactly what the package-lock.json says, deletes node_modules first, fails if package.json and lockfile disagree, never touches the lockfile
+- npm run lint (same script as local)
+- npx prettier (checks js only reports, never writes, fails if any files differ)
+
+### Three runs
+In the Actions tab, you can see these happening. Once I pushed, it was green and worked well. I then purposefully made it fail by breaking formatting on purpose
+(in navigation.ts, I changed:
+window.location.hash = viewname; to
+window.location.hash=viewname;)
+and it failed as expected. I then fixed that mistake and it went to green again.
+
+### Questions
+_workflow vs job vs step, point at one of each_
+- Workflow = whole file, triggered by an even (e.g. CI, triggered by push / pull_request)
+- Job = unit that runs on its own fresh machine (lint, runs on: ubuntu-latest), several jobs run in parallel by default
+- Step = one command or action inside a job, run in order on that job's machine (lint, npm run lint). If a step fails, the remaining steps of that job are skipped and the job fails
+
+_why lint/format in CI if it runs on my machine anyway ?_
+- Just because it _can_ run locally, does not mean you'll do it every time. It is the same as expecting all strangers to wash their hands, some people just won't and it'll be your problem to deal with if you shake their hand. This ensures it runs, every time
+
+_What does dependency caching do, and what if I removed it ?_
+- setup-node saves npm's download cache at the end of a successful run, und a key built from a hash of the package-lock.json. Next run with the same lockfile: cache restored, npm ci takes the packages from the disk instead of downloading them all over again
+- If removed, it doesn't change the correctness of anything, just potentially slows down future runs
+
